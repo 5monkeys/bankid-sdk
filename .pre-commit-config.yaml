@@ -1,0 +1,43 @@
+default_language_version:
+    python: python3.10
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+    - id: check-case-conflict
+    - id: check-merge-conflict
+    - id: check-yaml
+    - id: check-toml
+    - id: end-of-file-fixer
+    - id: trailing-whitespace
+    - id: debug-statements
+    - id: detect-private-key
+  - repo: https://github.com/psf/black
+    rev: 23.11.0
+    hooks:
+      - id: black
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: 'v0.1.5'
+    hooks:
+      - id: ruff
+
+exclude: |
+  (?x)(
+    /(
+      \.eggs
+      | \.git
+      | \.hg
+      | \.mypy_cache
+      | \.pytest_cache
+      | \.nox
+      | \.tox
+      | \.venv
+      | _build
+      | buck-out
+      | build
+      | dist
+    )/
+    | ^src/bankid_api/__version__\.py$
+    | ^tests/fixtures/fake_cert\.pem$
+    | ^tests/fixtures/fake_client\.key$
+  )
