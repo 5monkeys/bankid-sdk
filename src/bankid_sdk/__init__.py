@@ -1,3 +1,5 @@
+from importlib.metadata import PackageNotFoundError, version
+
 from ._actions import (
     Action,
     AuthAction,
@@ -62,3 +64,8 @@ __all__ = [
     "generate_qr_code",
     "init_auth",
 ]
+
+try:
+    __version__ = version(__name__)
+except PackageNotFoundError:
+    __version__ = "unknown"

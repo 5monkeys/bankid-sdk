@@ -1,11 +1,11 @@
 [build-system]
-requires = ["setuptools", "setuptools-scm"]
+requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "bankid-sdk"
+version = "0.0.1"
 description = "A Python SDK for BankID"
-dynamic = ["version"]
 dependencies = [
   "abcattrs",
   "httpx",
@@ -25,9 +25,6 @@ dev = [
   "pytest-randomly",
   "respx",
 ]
-
-[tool.setuptools_scm]
-write_to = "src/bankid_sdk/__version__.py"
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "src"]
