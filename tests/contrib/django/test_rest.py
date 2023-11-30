@@ -109,6 +109,7 @@ def _configure_bankid_sdk(fixtures_dir: Path) -> None:
             str(fixtures_dir / "fake_cert.pem"),
             str(fixtures_dir / "fake_client.key"),
         ),
+        ca_cert=str(fixtures_dir / "fake_cacert.crt"),
     )
 
 

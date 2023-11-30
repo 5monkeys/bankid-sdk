@@ -82,6 +82,8 @@ class _Configuration:
     ACTIONS = LazyAttr[ActionRegistry]()
     # two-tuple of certificate file path and key file path
     CERT = LazyAttr[tuple[str, str]]()
+    # BankID's CA root certificate file
+    CA_CERT = LazyAttr[str]()
 
 
 config: Final = _Configuration()
@@ -92,6 +94,7 @@ def configure(
     storage: Storage | None = None,
     actions: Iterable[type[AuthAction] | type[SignAction]] | None = None,
     certificate: tuple[str, str] | None = None,
+    ca_cert: str | None = None,
 ) -> None:
     if api_base_url is not None:
         config.API_BASE_URL = api_base_url
@@ -109,3 +112,5 @@ def configure(
         )
     if certificate is not None:
         config.CERT = certificate
+    if ca_cert is not None:
+        config.CA_CERT = ca_cert

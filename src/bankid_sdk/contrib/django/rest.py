@@ -77,7 +77,9 @@ def auth(request: HttpRequest, data: dict[str, Any]) -> JsonResponse:
         return JsonResponse({"detail": "Invalid IP"}, status=HTTPStatus.BAD_REQUEST)
 
     with httpx.Client(
-        base_url=bankid_sdk.config.API_BASE_URL, cert=bankid_sdk.config.CERT
+        base_url=bankid_sdk.config.API_BASE_URL,
+        cert=bankid_sdk.config.CERT,
+        verify=bankid_sdk.config.CA_CERT,
     ) as client:
         try:
             order = bankid_sdk.init_auth(
@@ -153,7 +155,9 @@ def validate_transaction_id(
 @validate_transaction_id
 def check(request: HttpRequest, transaction_id: TransactionID) -> JsonResponse:
     with httpx.Client(
-        base_url=bankid_sdk.config.API_BASE_URL, cert=bankid_sdk.config.CERT
+        base_url=bankid_sdk.config.API_BASE_URL,
+        cert=bankid_sdk.config.CERT,
+        verify=bankid_sdk.config.CA_CERT,
     ) as client:
         try:
             result, qr_code = bankid_sdk.check(
@@ -204,7 +208,9 @@ def check(request: HttpRequest, transaction_id: TransactionID) -> JsonResponse:
 @validate_transaction_id
 def cancel(request: HttpRequest, transaction_id: TransactionID) -> HttpResponse:
     with httpx.Client(
-        base_url=bankid_sdk.config.API_BASE_URL, cert=bankid_sdk.config.CERT
+        base_url=bankid_sdk.config.API_BASE_URL,
+        cert=bankid_sdk.config.CERT,
+        verify=bankid_sdk.config.CA_CERT,
     ) as client:
         bankid_sdk.cancel(bankid_sdk.SyncV60(client=client), transaction_id)
 
