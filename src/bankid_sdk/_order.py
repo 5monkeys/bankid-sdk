@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import hashlib
 import hmac
 from dataclasses import dataclass
@@ -18,7 +20,7 @@ class OrderRequest(NamedTuple):
     context: Any
 
 
-@dataclass(frozen=True, kw_only=True, slots=True)
+@dataclass(frozen=True)
 class OrderResponse:
     order_ref: OrderRef
     auto_start_token: str
@@ -50,7 +52,7 @@ class SerializedTransaction(TypedDict):
     context: Any
 
 
-@dataclass(frozen=True, kw_only=True, slots=True)
+@dataclass(frozen=True)
 class Transaction:
     order_response: OrderResponse
     operation: Literal["auth", "sign"]

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from typing import (
     Any,
@@ -24,7 +26,7 @@ def validate_personal_number(value: str | None, /) -> PersonalNumber | None:
     return PersonalNumber(value)
 
 
-@dataclass(kw_only=True, slots=True)
+@dataclass()
 class Requirement:
     pin_code: Literal[True] | None = None
     mrtd: Literal[True] | None = None

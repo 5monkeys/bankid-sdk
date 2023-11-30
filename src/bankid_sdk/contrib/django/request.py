@@ -8,9 +8,10 @@ from contextlib import suppress
 from functools import wraps
 from http import HTTPStatus
 from ipaddress import IPv4Address, IPv6Address, ip_address
-from typing import Any, Concatenate, NoReturn, ParamSpec
+from typing import Any, NoReturn
 
 from django.http import HttpRequest, HttpResponse, JsonResponse
+from typing_extensions import Concatenate, ParamSpec
 
 
 def load_stream(request: HttpRequest) -> codecs._ReadableStream:

@@ -3,7 +3,6 @@ from collections.abc import Generator
 from contextlib import contextmanager
 from datetime import date
 from http import HTTPStatus
-from typing import TypeAlias
 
 import httpx
 import pytest
@@ -23,9 +22,9 @@ from bankid_sdk import (
     SyncV60,
     User,
 )
+from bankid_sdk._collect import CollectResponse
 from tests.mocks import bankid_mock
 
-CollectReturn: TypeAlias = PendingCollect | CompleteCollect | FailedCollect
 pytestmark = pytest.mark.usefixtures("mock_bankid")
 
 
@@ -62,7 +61,7 @@ def test_can_send_collect_request_sync(sync_v60: SyncV60) -> None:
         sync_v60.collect(order_ref)
 
 
-def can_collect_completed_context() -> Generator[OrderRef, CollectReturn, None]:
+def can_collect_completed_context() -> Generator[OrderRef, CollectResponse, None]:
     bankid_mock["collect"].return_value = httpx.Response(
         HTTPStatus.OK,
         json={
@@ -175,7 +174,7 @@ failed_collect_code_cases = pytest.mark.parametrize(
 
 def failed_collect_context(
     hint_code: str, expected: FailedHintCode
-) -> Generator[OrderRef, CollectReturn, None]:
+) -> Generator[OrderRef, CollectResponse, None]:
     bankid_mock["collect"].return_value = httpx.Response(
         HTTPStatus.OK,
         json={"orderRef": "ref", "status": "failed", "hintCode": hint_code},

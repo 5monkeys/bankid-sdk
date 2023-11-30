@@ -3,10 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date
 from enum import Enum, unique
-from typing import TYPE_CHECKING, Any, TypeAlias
+from typing import TYPE_CHECKING, Any, Union
 
 import httpx
-from typing_extensions import assert_never
+from typing_extensions import TypeAlias, assert_never
 
 from ._config import config
 from ._order import generate_qr_code
@@ -45,7 +45,7 @@ class FailedHintCode(str, Enum):
     UNKNOWN = "unknown"
 
 
-@dataclass(frozen=True, kw_only=True, slots=True)
+@dataclass(frozen=True)
 class User:
     personal_number: PersonalNumber
     name: str
@@ -53,18 +53,18 @@ class User:
     surname: str
 
 
-@dataclass(frozen=True, kw_only=True, slots=True)
+@dataclass(frozen=True)
 class Device:
     ip_address: str
     uhi: str | None
 
 
-@dataclass(frozen=True, kw_only=True, slots=True)
+@dataclass(frozen=True)
 class StepUp:
     mrtd: bool
 
 
-@dataclass(frozen=True, kw_only=True, slots=True)
+@dataclass(frozen=True)
 class CompletionData:
     user: User
     device: Device
@@ -74,25 +74,25 @@ class CompletionData:
     ocsp_response: str
 
 
-@dataclass(frozen=True, kw_only=True, slots=True)
+@dataclass(frozen=True)
 class PendingCollect:
     order_ref: OrderRef
     hint_code: PendingHintCode
 
 
-@dataclass(frozen=True, kw_only=True, slots=True)
+@dataclass(frozen=True)
 class CompleteCollect:
     order_ref: OrderRef
     completion_data: CompletionData
 
 
-@dataclass(frozen=True, kw_only=True, slots=True)
+@dataclass(frozen=True)
 class FailedCollect:
     order_ref: OrderRef
     hint_code: FailedHintCode
 
 
-CollectResponse: TypeAlias = PendingCollect | CompleteCollect | FailedCollect
+CollectResponse: TypeAlias = Union[PendingCollect, CompleteCollect, FailedCollect]
 
 
 def process_collect_response(response: httpx.Response) -> CollectResponse:
@@ -158,7 +158,7 @@ def check(
         raise TransactionExpired
 
     result = client.collect(transaction.order_response.order_ref)
-    if isinstance(result, CompleteCollect | FailedCollect):
+    if isinstance(result, (CompleteCollect, FailedCollect)):
         # Clear transaction from storage as soon as we encounter a finished BankID
         # collection. As we can't interact with its order any longer
         config.STORAGE.delete(transaction_id)

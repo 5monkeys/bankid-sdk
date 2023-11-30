@@ -8,12 +8,11 @@ from typing import (
     Final,
     Generic,
     Literal,
-    TypeAlias,
     TypeVar,
     overload,
 )
 
-from typing_extensions import Self
+from typing_extensions import Self, TypeAlias
 
 from ._actions import Action, AuthAction, SignAction
 

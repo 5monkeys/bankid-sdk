@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import asyncio
 from collections import deque
 from collections.abc import Awaitable, Callable, Generator, Iterable
@@ -5,10 +7,8 @@ from contextlib import AbstractContextManager, ExitStack, contextmanager
 from functools import wraps
 from typing import (
     Any,
-    Concatenate,
     Final,
     Literal,
-    ParamSpec,
     Protocol,
     TypeVar,
     overload,
@@ -16,6 +16,7 @@ from typing import (
 from urllib.parse import urljoin
 
 import httpx
+from typing_extensions import Concatenate, ParamSpec
 
 from ._auth import build_auth_request
 from ._collect import (

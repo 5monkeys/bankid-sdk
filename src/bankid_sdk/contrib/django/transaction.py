@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from contextlib import suppress
 from datetime import timedelta
 from typing import Final
