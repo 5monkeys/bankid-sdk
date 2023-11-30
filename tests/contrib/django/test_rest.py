@@ -93,7 +93,7 @@ class FailsFinalizeAction(bankid_sdk.AuthAction):
 
 
 @pytest.fixture()
-def configure_bankid_sdk(fixtures_dir: Path) -> Generator[None, None, None]:
+def _configure_bankid_sdk(fixtures_dir: Path) -> None:
     bankid_sdk.configure(
         api_base_url="https://example.com",
         storage=CacheStorage(),
@@ -108,11 +108,9 @@ def configure_bankid_sdk(fixtures_dir: Path) -> Generator[None, None, None]:
             str(fixtures_dir / "fake_client.key"),
         ),
     )
-    with override_settings(BANKID_SDK_COMPLETE_TOKEN_MAX_AGE_SECONDS=60):
-        yield None
 
 
-pytestmark = pytest.mark.usefixtures("mock_bankid", "configure_bankid_sdk")
+pytestmark = pytest.mark.usefixtures("mock_bankid", "_configure_bankid_sdk")
 
 
 endpoints = pytest.mark.parametrize(
