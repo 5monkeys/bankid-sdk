@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import date
 from enum import Enum, unique
 from typing import TYPE_CHECKING, Any, Union
 
@@ -68,7 +67,7 @@ class StepUp:
 class CompletionData:
     user: User
     device: Device
-    bankid_issue_date: date
+    bankid_issue_date: str
     step_up: StepUp | None
     signature: str
     ocsp_response: str
@@ -126,9 +125,7 @@ def process_collect_response(response: httpx.Response) -> CollectResponse:
                 device=Device(
                     ip_address=str(device["ipAddress"]), uhi=device.get("uhi")
                 ),
-                bankid_issue_date=date.fromisoformat(
-                    completion_data["bankIdIssueDate"]
-                ),
+                bankid_issue_date=completion_data["bankIdIssueDate"],
                 step_up=StepUp(mrtd=step_up["mrtd"]) if step_up is not None else None,
                 signature=completion_data["signature"],
                 ocsp_response=completion_data["ocspResponse"],

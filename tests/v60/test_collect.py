@@ -1,7 +1,6 @@
 import json
 from collections.abc import Generator
 from contextlib import contextmanager
-from datetime import date
 from http import HTTPStatus
 
 import httpx
@@ -94,7 +93,7 @@ def can_collect_completed_context() -> Generator[OrderRef, CollectResponse, None
                 surname="Smith",
             ),
             device=Device(ip_address="127.0.0.1", uhi=None),
-            bankid_issue_date=date(2023, 1, 1),
+            bankid_issue_date="2023-01-01",
             step_up=None,
             signature="base64",
             ocsp_response="base64",
