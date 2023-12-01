@@ -40,7 +40,7 @@ class DjangoLoginAction(bankid_sdk.AuthAction):
         return auth_data, context
 
     def finalize(
-        self, completion_data: bankid_sdk.CompleteCollect, request: Any, context: Any
+        self, response: bankid_sdk.CompleteCollect, request: Any, context: Any
     ) -> None:
         return None
 
@@ -56,7 +56,7 @@ class ForbiddenAction(bankid_sdk.AuthAction):
         )
 
     def finalize(
-        self, completion_data: bankid_sdk.CompleteCollect, request: Any, context: Any
+        self, response: bankid_sdk.CompleteCollect, request: Any, context: Any
     ) -> None:
         return None
 
@@ -70,7 +70,7 @@ class FailsInitAction(bankid_sdk.AuthAction):
         raise bankid_sdk.InitFailed
 
     def finalize(
-        self, completion_data: bankid_sdk.CompleteCollect, request: Any, context: Any
+        self, response: bankid_sdk.CompleteCollect, request: Any, context: Any
     ) -> None:
         return None
 
@@ -89,7 +89,7 @@ class FailsFinalizeAction(bankid_sdk.AuthAction):
         )
 
     def finalize(
-        self, completion_data: bankid_sdk.CompleteCollect, request: Any, context: Any
+        self, response: bankid_sdk.CompleteCollect, request: Any, context: Any
     ) -> None:
         raise bankid_sdk.FinalizeFailed
 

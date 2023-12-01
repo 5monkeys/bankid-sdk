@@ -71,7 +71,7 @@ class Action(ABC):
     @abstractmethod
     def finalize(
         self,
-        completion_data: CompleteCollect,
+        response: CompleteCollect,
         request: Any,
         context: TransactionContext,
     ) -> None:
