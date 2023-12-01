@@ -29,7 +29,7 @@ from tests.mocks import bankid_mock
 class DjangoLoginAction(bankid_sdk.AuthAction):
     name = "LOGIN"
 
-    def init(
+    def initialize(
         self, request: Any, context: Any
     ) -> tuple[bankid_sdk.UserAuthData, dict[str, Any] | None]:
         auth_data = bankid_sdk.UserAuthData(
@@ -48,7 +48,7 @@ class DjangoLoginAction(bankid_sdk.AuthAction):
 class ForbiddenAction(bankid_sdk.AuthAction):
     name = "FORBIDDEN_ACTION"
 
-    def init(
+    def initialize(
         self, request: Any, context: Any
     ) -> tuple[bankid_sdk.UserAuthData, dict[str, Any] | None]:
         raise bankid_sdk.InitFailed(
@@ -64,7 +64,7 @@ class ForbiddenAction(bankid_sdk.AuthAction):
 class FailsInitAction(bankid_sdk.AuthAction):
     name = "FAILS_INIT_ACTION"
 
-    def init(
+    def initialize(
         self, request: Any, context: Any
     ) -> tuple[bankid_sdk.UserAuthData, dict[str, Any] | None]:
         raise bankid_sdk.InitFailed
@@ -78,7 +78,7 @@ class FailsInitAction(bankid_sdk.AuthAction):
 class FailsFinalizeAction(bankid_sdk.AuthAction):
     name = "FAILS_FINALIZE_ACTION"
 
-    def init(
+    def initialize(
         self, request: Any, context: Any
     ) -> tuple[bankid_sdk.UserAuthData, dict[str, Any] | None]:
         return (

@@ -57,7 +57,7 @@ class Action(ABC):
     name: ClassVar[Abstract[str]]
 
     @abstractmethod
-    def init(
+    def initialize(
         self, request: Any, context: Any
     ) -> (
         tuple[UserAuthData, TransactionContext]
@@ -80,7 +80,7 @@ class Action(ABC):
 
 class AuthAction(Action):
     @abstractmethod
-    def init(
+    def initialize(
         self, request: Any, context: Any
     ) -> tuple[UserAuthData, TransactionContext]:
         """
@@ -91,7 +91,7 @@ class AuthAction(Action):
 
 class SignAction(Action):
     @abstractmethod
-    def init(
+    def initialize(
         self, request: Any, context: Any
     ) -> tuple[UserSignData, TransactionContext]:
         """

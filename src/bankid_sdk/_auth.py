@@ -54,7 +54,7 @@ class AuthOrder(NamedTuple):
 def init_auth(
     client: SyncV60, action: type[AuthAction], order_request: OrderRequest
 ) -> AuthOrder:
-    user_data, transaction_context = action().init(
+    user_data, transaction_context = action().initialize(
         order_request.request, order_request.context
     )
     order_response = client.auth(
