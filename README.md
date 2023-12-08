@@ -34,11 +34,15 @@ of `bankid_sdk.SignAction`.
 is done by calling `bankid_sdk.configure(...)` with relevant values.
 
 ```python
-import bankid_sdk
 from typing import Any
+
+import bankid_sdk
 
 
 class BankIDLoginAction(bankid_sdk.AuthAction):
+    """
+    My fancy action that logs in a user.
+    """
     name = "LOGIN"
 
     def initialize(
@@ -82,7 +86,8 @@ The `bankid-sdk` package includes a couple of contributed pieces for
 ### Example setup
 
 To quickly get up and running with your BankID integration with Django you can register
-the predeclared views and configure `bankid-sdk` to store results in the cache.
+the predeclared JSON based views and configure `bankid-sdk` to store results in the
+cache.
 
 #### Register the Django views from `bankid-sdk`
 
