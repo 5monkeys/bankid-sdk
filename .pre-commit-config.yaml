@@ -41,7 +41,7 @@ exclude: |
       | build
       | dist
     )/
-    | ^src/bankid_api/__version__\.py$
+    | ^src/bankid_api/_version\.py$
     | ^tests/fixtures/fake_cert\.pem$
     | ^tests/fixtures/fake_client\.key$
   )

@@ -41,9 +41,7 @@ class TestParseJSONBody:
 
     def test_passes_through_empty_body_when_content_length_is_missing(self) -> None:
         view = mock.MagicMock(return_value=JsonResponse({}))
-        request = RequestFactory().generic(
-            "POST", "/", headers={"Content-Type": "application/json"}
-        )
+        request = RequestFactory(CONTENT_TYPE="application/json").generic("POST", "/")
         response = parse_json_body(view)(request)
         assert response.status_code == HTTPStatus.OK
 
@@ -51,11 +49,9 @@ class TestParseJSONBody:
 
     def test_passes_through_empty_body_when_content_length_is_zero(self) -> None:
         view = mock.MagicMock(return_value=JsonResponse({}))
-        request = RequestFactory().generic(
-            "POST",
-            "/",
-            headers={"Content-Type": "application/json", "Content-Length": "0"},
-        )
+        request = RequestFactory(
+            CONTENT_TYPE="application/json", CONTENT_LENGTH="0"
+        ).generic("POST", "/")
         response = parse_json_body(view)(request)
         assert response.status_code == HTTPStatus.OK
 
@@ -65,11 +61,9 @@ class TestParseJSONBody:
         self,
     ) -> None:
         view = mock.MagicMock(return_value=JsonResponse({}))
-        request = RequestFactory().generic(
-            "POST",
-            "/",
-            headers={"Content-Type": "application/json", "Content-Length": "abc"},
-        )
+        request = RequestFactory(
+            CONTENT_TYPE="application/json", CONTENT_LENGTH="abc"
+        ).generic("POST", "/")
         response = parse_json_body(view)(request)
         assert response.status_code == HTTPStatus.OK
 

@@ -1,23 +1,56 @@
 [build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
+build-backend = "hatchling.build"
+requires = ["hatch-vcs", "hatchling"]
 
 [project]
 name = "bankid-sdk"
-version = "0.0.1"
 description = "A Python SDK for BankID"
+readme = "README.md"
+keywords = [
+  "bankid",
+  "rest",
+  "client",
+  "django",
+]
+license = "BSD-3-Clause"
+authors = [{ name = "Jonas Lundberg", email = "jonas@5monkeys.se" }]
+requires-python = ">=3.9"
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: BSD License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Framework :: Django",
+  "Framework :: Django :: 4.1",
+  "Framework :: Django :: 4.2",
+  "Framework :: Django :: 5.0",
+  "Typing :: Typed",
+]
+dynamic = [
+  "version",
+]
 dependencies = [
   "abcattrs",
   "httpx",
 ]
+urls.Homepage = "https://github.com/5monkeys/bankid-sdk"
+urls.Source = "https://github.com/5monkeys/bankid-sdk"
+urls.Tracker = "https://github.com/5monkeys/bankid-sdk/issues"
 
 [project.optional-dependencies]
-dev = [
+django = [
+  "django",
+]
+test = [
+  "bankid-sdk[django]",
   "dirty-equals",
   "django-stubs",
   "freezegun",
-  "mypy",
-  "pre-commit",
   "pytest",
   "pytest-asyncio",
   "pytest-cov",
@@ -25,11 +58,26 @@ dev = [
   "pytest-randomly",
   "respx",
 ]
+dev = [
+  "bankid-sdk[test]",
+  "mypy",
+  "pre-commit",
+]
+
+[tool.hatch]
+build.hooks.vcs.version-file = "src/bankid_sdk/_version.py"
+version.source = "vcs"
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "src"]
 addopts = "--cov --no-cov-on-fail"
 asyncio_mode = "auto"
+
+[tool.coverage.paths]
+source = [
+  "src/bankid_sdk",
+  ".tox/*/lib/*/site-packages/bankid_sdk",
+]
 
 [tool.coverage.report]
 skip_covered = true
@@ -43,20 +91,15 @@ exclude_also = [
 fail_under = 100
 
 [tool.coverage.run]
+parallel = true
 branch = true
-source = ["src/"]
-omit = [
-  "src/bankid_sdk/__version__.py",
-]
+source = ["bankid_sdk", "tests"]
 
 [tool.mypy]
 python_version = "3.9"
 pretty = true
 show_error_codes = true
 files = "src, tests"
-exclude = '''(?x)(
-    ^src/bankid_sdk/__version__\.py$
-)'''
 
 no_implicit_optional = true
 strict_optional = true

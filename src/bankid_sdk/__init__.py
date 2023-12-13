@@ -1,5 +1,3 @@
-from importlib.metadata import PackageNotFoundError, version
-
 from ._actions import (
     Action,
     AuthAction,
@@ -30,7 +28,13 @@ from ._requirement import Requirement
 from .errors import BankIDAPIError, BankIDHTTPError
 from .typing import OrderRef, PersonalNumber
 
+try:
+    from ._version import __version__
+except ImportError:  # pragma: no cover
+    __version__ = "unknown"
+
 __all__ = [
+    "__version__",
     "Action",
     "AuthAction",
     "AsyncV60",
@@ -64,8 +68,3 @@ __all__ = [
     "generate_qr_code",
     "init_auth",
 ]
-
-try:
-    __version__ = version(__name__)
-except PackageNotFoundError:
-    __version__ = "unknown"

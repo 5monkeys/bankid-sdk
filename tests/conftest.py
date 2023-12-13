@@ -11,7 +11,7 @@ from .mocks import bankid_mock
 def configure_django() -> None:
     try:
         import django
-    except ImportError:
+    except ImportError:  # pragma: no cover
         return
 
     from django.conf import settings
