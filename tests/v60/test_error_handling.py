@@ -153,12 +153,12 @@ async def test_can_add_additional_exception_handling(
         try:
             yield
         except bankid_sdk.BankIDAPIError as exc:
-            if (  # prama: no branch
+            if (
                 exc.response is not None
                 and exc.response.status_code == HTTPStatus.BAD_REQUEST
             ):
                 raise CustomException from exc
-            raise
+            raise  # pragma: no cover
 
     async_v60.handle(handle_something_additional())
 
