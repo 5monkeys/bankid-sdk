@@ -1,6 +1,9 @@
 [build-system]
 build-backend = "hatchling.build"
-requires = ["hatch-vcs", "hatchling"]
+requires = [
+  "hatch-vcs",
+  "hatchling",
+]
 
 [project]
 name = "bankid-sdk"
@@ -8,15 +11,19 @@ description = "A Python SDK for BankID"
 readme = "README.md"
 keywords = [
   "bankid",
-  "rest",
   "client",
   "django",
+  "rest",
 ]
 license = "BSD-3-Clause"
 authors = [{ name = "Jonas Lundberg", email = "jonas@5monkeys.se" }]
 requires-python = ">=3.9"
 classifiers = [
   "Development Status :: 4 - Beta",
+  "Framework :: Django",
+  "Framework :: Django :: 4.1",
+  "Framework :: Django :: 4.2",
+  "Framework :: Django :: 5.0",
   "Intended Audience :: Developers",
   "License :: OSI Approved :: BSD License",
   "Operating System :: OS Independent",
@@ -25,10 +32,6 @@ classifiers = [
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
-  "Framework :: Django",
-  "Framework :: Django :: 4.1",
-  "Framework :: Django :: 4.2",
-  "Framework :: Django :: 5.0",
   "Typing :: Typed",
 ]
 dynamic = [
@@ -38,15 +41,15 @@ dependencies = [
   "abcattrs",
   "httpx",
 ]
-urls.Homepage = "https://github.com/5monkeys/bankid-sdk"
-urls.Source = "https://github.com/5monkeys/bankid-sdk"
-urls.Tracker = "https://github.com/5monkeys/bankid-sdk/issues"
-
-[project.optional-dependencies]
-django = [
+optional-dependencies.dev = [
+  "bankid-sdk[test]",
+  "mypy",
+  "pre-commit",
+]
+optional-dependencies.django = [
   "django",
 ]
-test = [
+optional-dependencies.test = [
   "bankid-sdk[django]",
   "dirty-equals",
   "django-stubs",
@@ -58,54 +61,13 @@ test = [
   "pytest-randomly",
   "respx",
 ]
-dev = [
-  "bankid-sdk[test]",
-  "mypy",
-  "pre-commit",
-]
+urls.Homepage = "https://github.com/5monkeys/bankid-sdk"
+urls.Source = "https://github.com/5monkeys/bankid-sdk"
+urls.Tracker = "https://github.com/5monkeys/bankid-sdk/issues"
 
 [tool.hatch]
 build.hooks.vcs.version-file = "src/bankid_sdk/_version.py"
 version.source = "vcs"
-
-[tool.pytest.ini_options]
-testpaths = ["tests", "src"]
-addopts = "--cov --no-cov-on-fail"
-asyncio_mode = "auto"
-
-[tool.coverage.paths]
-source = [
-  "src/bankid_sdk",
-  ".tox/*/lib/*/site-packages/bankid_sdk",
-]
-
-[tool.coverage.report]
-skip_covered = true
-show_missing = true
-exclude_also = [
-  # ignore non-implementations
-  '^\s*\.\.\.',
-  "if TYPE_CHECKING:",
-  '^\s*(def\s)?assert_never(.*)$',
-]
-fail_under = 100
-
-[tool.coverage.run]
-parallel = true
-branch = true
-source = ["bankid_sdk", "tests"]
-
-[tool.mypy]
-python_version = "3.9"
-pretty = true
-show_error_codes = true
-files = "src, tests"
-
-no_implicit_optional = true
-strict_optional = true
-ignore_missing_imports = false
-warn_unreachable = true
-strict = true
 
 [tool.black]
 target-version = ["py39"]
@@ -167,3 +129,42 @@ ignore = [
 [tool.ruff.isort]
 known-first-party = ["bankid_sdk", "tests"]
 combine-as-imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "src"]
+addopts = "--cov --no-cov-on-fail"
+asyncio_mode = "auto"
+
+[tool.coverage.paths]
+source = [
+  "src/bankid_sdk",
+  ".tox/*/lib/*/site-packages/bankid_sdk",
+]
+
+[tool.coverage.report]
+skip_covered = true
+show_missing = true
+exclude_also = [
+  # ignore non-implementations
+  '^\s*\.\.\.',
+  "if TYPE_CHECKING:",
+  '^\s*(def\s)?assert_never(.*)$',
+]
+fail_under = 100
+
+[tool.coverage.run]
+parallel = true
+branch = true
+source = ["bankid_sdk", "tests"]
+
+[tool.mypy]
+python_version = "3.9"
+pretty = true
+show_error_codes = true
+files = "src, tests"
+
+no_implicit_optional = true
+strict_optional = true
+ignore_missing_imports = false
+warn_unreachable = true
+strict = true
