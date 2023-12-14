@@ -46,6 +46,12 @@ jobs:
         run: tox -vv --notest
       - name: Run test suite
         run: tox --skip-pkg-install
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: true
+          name: codecov-py${{ matrix.py }}
 
   static-typing:
     runs-on: ubuntu-latest
