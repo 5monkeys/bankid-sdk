@@ -25,8 +25,9 @@ from ._collect import (
 from ._config import config, configure
 from ._order import OrderRequest, OrderResponse, Transaction, generate_qr_code
 from ._requirement import Requirement
+from ._storage import MemoryStorage
 from .errors import BankIDAPIError, BankIDHTTPError
-from .typing import OrderRef, PersonalNumber
+from .typing import OrderRef, PersonalNumber, TransactionID
 
 try:
     from ._version import __version__
@@ -47,6 +48,7 @@ __all__ = [
     "FailedHintCode",
     "FinalizeFailed",
     "InitFailed",
+    "MemoryStorage",
     "OrderRef",
     "OrderRequest",
     "OrderResponse",
@@ -58,6 +60,7 @@ __all__ = [
     "SyncV60",
     "Transaction",
     "TransactionExpired",
+    "TransactionID",
     "User",
     "UserAuthData",
     "UserSignData",

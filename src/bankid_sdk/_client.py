@@ -16,7 +16,7 @@ from typing import (
 from urllib.parse import urljoin
 
 import httpx
-from typing_extensions import Concatenate, ParamSpec
+from typing_extensions import Concatenate, ParamSpec, Self
 
 from ._auth import build_auth_request
 from ._collect import (
@@ -103,6 +103,15 @@ class V60Base:
             "Content-Type": "application/json",
         }
         self._exc_hooks = deque[AbstractContextManager[Any]]()
+
+    def handle(self, exc_hook: AbstractContextManager[Any], /) -> Self:
+        """
+        Hook in to exception propagation with a context manager. During the next
+        exception handling.
+        """
+        # TODO: Raise an error if exception handler is activated?
+        self._exc_hooks.append(exc_hook)
+        return self
 
     def get_exc_hooks(self) -> Generator[AbstractContextManager[Any], None, None]:
         for _ in range(len(self._exc_hooks)):
