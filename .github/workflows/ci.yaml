@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   test:
-    name: Test ${{ matrix.py }}
+    name: Test ${{ matrix.py }} - django${{ matrix.django }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
