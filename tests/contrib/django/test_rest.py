@@ -58,7 +58,7 @@ class ForbiddenAction(bankid_sdk.AuthAction):
     def finalize(
         self, response: bankid_sdk.CompleteCollect, request: Any, context: Any
     ) -> None:
-        return None
+        ...
 
 
 class FailsInitAction(bankid_sdk.AuthAction):
@@ -72,7 +72,7 @@ class FailsInitAction(bankid_sdk.AuthAction):
     def finalize(
         self, response: bankid_sdk.CompleteCollect, request: Any, context: Any
     ) -> None:
-        return None
+        ...
 
 
 class FailsFinalizeAction(bankid_sdk.AuthAction):

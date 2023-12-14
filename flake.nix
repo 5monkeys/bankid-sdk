@@ -28,6 +28,7 @@
               ${pkgs.python39}/bin/python -m \
                 venv --copies --upgrade-deps .venv > /dev/null
             source .venv/bin/activate
+            pip install --require-virtualenv --no-input tox
           '';
         };
       });
