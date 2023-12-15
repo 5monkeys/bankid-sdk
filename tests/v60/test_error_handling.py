@@ -1,4 +1,5 @@
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Generator
+from contextlib import contextmanager
 from functools import partial
 from http import HTTPStatus
 from typing import Any
@@ -7,7 +8,7 @@ import httpx
 import pytest
 import respx
 
-from bankid_sdk import AsyncV60
+import bankid_sdk
 from bankid_sdk.errors import (
     AlreadyInProgress,
     InternalServerError,
@@ -22,11 +23,13 @@ from bankid_sdk.errors import (
 )
 from tests.mocks import bankid_mock
 
+pytestmark = pytest.mark.usefixtures("mock_bankid")
+
 
 @pytest.fixture()
 def default_routing(
     request: pytest.FixtureRequest,
-    async_v60: AsyncV60,
+    async_v60: bankid_sdk.AsyncV60,
 ) -> tuple[respx.Route, Callable[[], Awaitable[Any]]]:
     call: Callable[[], Any]
     if request.param == "auth":
@@ -137,3 +140,30 @@ async def test_raises(
     )
     with pytest.raises(expected_exc):
         await call()
+
+
+async def test_can_add_additional_exception_handling(
+    async_v60: bankid_sdk.AsyncV60,
+) -> None:
+    class CustomException(Exception):
+        ...
+
+    @contextmanager
+    def handle_something_additional() -> Generator[None, None, None]:
+        try:
+            yield
+        except bankid_sdk.BankIDAPIError as exc:
+            if (
+                exc.response is not None
+                and exc.response.status_code == HTTPStatus.BAD_REQUEST
+            ):
+                raise CustomException from exc
+            raise  # pragma: no cover
+
+    async_v60.handle(handle_something_additional())
+
+    bankid_mock["collect"].return_value = httpx.Response(
+        HTTPStatus.BAD_REQUEST, json={}
+    )
+    with pytest.raises(CustomException):
+        await async_v60.collect(bankid_sdk.OrderRef("REF"))

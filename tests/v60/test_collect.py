@@ -1,6 +1,7 @@
 import json
 from collections.abc import Generator
 from contextlib import contextmanager
+from datetime import date
 from http import HTTPStatus
 
 import httpx
@@ -201,3 +202,33 @@ def test_sync_failed_collect_can_recognise_hint_code(
     response = sync_v60.collect(next(gen))
     with pytest.raises(StopIteration):
         gen.send(response)
+
+
+@pytest.mark.xfail(
+    reason="Support BankID's custom _date_ format Z suffix", raises=AssertionError
+)
+def test_supports_bankid_responding_with_Z_as_timezone_suffix(
+    sync_v60: SyncV60,
+) -> None:
+    bankid_mock["collect"].return_value = httpx.Response(
+        HTTPStatus.OK,
+        json={
+            "orderRef": "ref",
+            "status": "complete",
+            "completionData": {
+                "user": {
+                    "personalNumber": "190000000000",
+                    "name": "John Smith",
+                    "givenName": "John",
+                    "surname": "Smith",
+                },
+                "device": {"ipAddress": "127.0.0.1"},
+                "bankIdIssueDate": "2023-11-29Z",
+                "signature": "base64",
+                "ocspResponse": "base64",
+            },
+        },
+    )
+    response = sync_v60.collect(OrderRef("ref"))
+    assert isinstance(response, CompleteCollect)
+    assert response.completion_data.bankid_issue_date == date(2023, 11, 29)

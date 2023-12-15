@@ -13,7 +13,6 @@ from django.views.decorators.csrf import csrf_exempt
 from typing_extensions import TypeAlias
 
 import bankid_sdk
-from bankid_sdk.typing import TransactionID
 from bankid_sdk.utils import logger
 
 from .request import get_client_ip, parse_json_body, require_POST
@@ -109,7 +108,7 @@ def auth(request: HttpRequest, data: dict[str, Any]) -> JsonResponse:
 
 
 def validate_transaction_id(
-    view: Callable[[HttpRequest, TransactionID], HttpResponse]
+    view: Callable[[HttpRequest, bankid_sdk.TransactionID], HttpResponse]
 ) -> Callable[[HttpRequest, dict[str, Any]], HttpResponse]:
     @wraps(view)
     def inner(request: HttpRequest, data: dict[str, Any], /) -> HttpResponse:
@@ -153,7 +152,9 @@ def validate_transaction_id(
 
 @api_view
 @validate_transaction_id
-def check(request: HttpRequest, transaction_id: TransactionID) -> JsonResponse:
+def check(
+    request: HttpRequest, transaction_id: bankid_sdk.TransactionID
+) -> JsonResponse:
     with httpx.Client(
         base_url=bankid_sdk.config.API_BASE_URL,
         cert=bankid_sdk.config.CERT,
@@ -206,7 +207,9 @@ def check(request: HttpRequest, transaction_id: TransactionID) -> JsonResponse:
 
 @api_view
 @validate_transaction_id
-def cancel(request: HttpRequest, transaction_id: TransactionID) -> HttpResponse:
+def cancel(
+    request: HttpRequest, transaction_id: bankid_sdk.TransactionID
+) -> HttpResponse:
     with httpx.Client(
         base_url=bankid_sdk.config.API_BASE_URL,
         cert=bankid_sdk.config.CERT,

@@ -1,9 +1,13 @@
 from collections.abc import Generator
+from http import HTTPStatus
 from pathlib import Path
+from uuid import uuid4
 
 import httpx
 import pytest
 import respx
+
+import bankid_sdk
 
 from .mocks import bankid_mock
 
@@ -53,3 +57,33 @@ def mocked_sync_client(mock_bankid: respx.Router) -> httpx.Client:
 @pytest.fixture()
 def fixtures_dir() -> Path:
     return Path(__file__).parent / "fixtures"
+
+
+@pytest.fixture()
+def valid_collect() -> bankid_sdk.OrderRef:
+    order_ref = bankid_sdk.OrderRef(str(uuid4()))
+    bankid_mock["collect"].side_effect = [
+        httpx.Response(
+            HTTPStatus.OK,
+            json={
+                "orderRef": order_ref,
+                "status": "complete",
+                "completionData": {
+                    "user": {
+                        "personalNumber": "190000000000",
+                        "name": "John Smith",
+                        "givenName": "John",
+                        "surname": "Smith",
+                    },
+                    "device": {"ipAddress": "127.0.0.1"},
+                    "bankIdIssueDate": "2023-01-01",
+                    "signature": "base64(<visible-data>...</visible-data>)",
+                    "ocspResponse": "base64",
+                },
+            },
+        ),
+    ]
+    bankid_mock["collect"].return_value = httpx.Response(
+        HTTPStatus.BAD_REQUEST, json={"errorCode": "invalidParameters"}
+    )
+    return order_ref

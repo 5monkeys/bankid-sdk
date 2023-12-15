@@ -6,20 +6,20 @@ from typing import Final
 
 from django.core import signing
 
-from bankid_sdk.typing import TransactionID
+import bankid_sdk
 
 _transaction_signer: Final = signing.TimestampSigner(
     salt="bankid_sdk.contrib.django.transaction"
 )
 
 
-def envelop(value: TransactionID, /) -> str:
+def envelop(value: bankid_sdk.TransactionID, /) -> str:
     return _transaction_signer.sign_object(value)
 
 
-def verify_envelope(value: str, /) -> TransactionID | None:
+def verify_envelope(value: str, /) -> bankid_sdk.TransactionID | None:
     with suppress(signing.BadSignature):
-        return TransactionID(
+        return bankid_sdk.TransactionID(
             _transaction_signer.unsign_object(value, max_age=timedelta(minutes=5))
         )
     return None

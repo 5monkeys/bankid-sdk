@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable, Mapping
+from contextlib import suppress
 from types import MappingProxyType
 from typing import (
     TYPE_CHECKING,
@@ -71,6 +72,10 @@ class LazyAttr(Generic[T]):
 
     def __set__(self, instance: _Configuration, value: T) -> None:
         self.value = value
+
+    def reset(self) -> None:
+        with suppress(AttributeError):
+            del self.value
 
 
 ActionRegistry: TypeAlias = Mapping[tuple[Literal["auth", "sign"], str], type["Action"]]
