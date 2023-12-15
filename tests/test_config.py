@@ -1,3 +1,5 @@
+import sys
+
 import pytest
 
 import bankid_sdk
@@ -15,8 +17,9 @@ class TestLazyAttr:
     def test_raises_runtimeerror_when_assigning_same_instance_to_different_names(
         self,
     ) -> None:
+        exc = TypeError if sys.version_info >= (3, 12) else RuntimeError
         x = LazyAttr[int]()
-        with pytest.raises(RuntimeError):
+        with pytest.raises(exc):
 
             class Obj:
                 A = x
