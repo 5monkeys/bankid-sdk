@@ -51,6 +51,8 @@ jobs:
           file: ./coverage.xml
           fail_ci_if_error: true
           name: codecov-py${{ matrix.py }}
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   static-typing:
     runs-on: ubuntu-latest
