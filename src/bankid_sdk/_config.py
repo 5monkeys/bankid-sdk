@@ -10,12 +10,20 @@ from typing import (
     Generic,
     Literal,
     TypeVar,
+    Union,
     overload,
 )
 
 from typing_extensions import Self, TypeAlias
 
-from ._actions import Action, AuthAction, SignAction
+from ._actions import (
+    Action,
+    AsyncAction,
+    AsyncAuthAction,
+    AsyncSignAction,
+    AuthAction,
+    SignAction,
+)
 
 if TYPE_CHECKING:
     from ._storage import Storage
@@ -78,12 +86,16 @@ class LazyAttr(Generic[T]):
             del self.value
 
 
-ActionRegistry: TypeAlias = Mapping[tuple[Literal["auth", "sign"], str], type["Action"]]
+ActionRegistry: TypeAlias = Mapping[
+    tuple[Literal["auth", "sign"], str],
+    Union[type["Action"], type["AsyncAction"]],
+]
 
 
 class _Configuration:
     API_BASE_URL = LazyAttr[str]()
     STORAGE = LazyAttr["Storage"]()
+    # ACTIONS = LazyAttr[Any]()
     ACTIONS = LazyAttr[ActionRegistry]()
     # two-tuple of certificate file path and key file path
     CERT = LazyAttr[tuple[str, str]]()
@@ -97,7 +109,13 @@ config: Final = _Configuration()
 def configure(
     api_base_url: str | None = None,
     storage: Storage | None = None,
-    actions: Iterable[type[AuthAction] | type[SignAction]] | None = None,
+    actions: Iterable[
+        type[AuthAction]
+        | type[SignAction]
+        | type[AsyncAuthAction]
+        | type[AsyncSignAction]
+    ]
+    | None = None,
     certificate: tuple[str, str] | None = None,
     ca_cert: str | None = None,
 ) -> None:
@@ -109,7 +127,10 @@ def configure(
         config.ACTIONS = MappingProxyType(
             {
                 (
-                    "auth" if issubclass(action, AuthAction) else "sign",
+                    "auth"
+                    if issubclass(action, AuthAction)
+                    or issubclass(action, AsyncAuthAction)
+                    else "sign",
                     action.name,
                 ): action
                 for action in actions

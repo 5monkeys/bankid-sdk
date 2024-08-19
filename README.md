@@ -77,11 +77,30 @@ bankid_sdk.configure(
 The `bankid-sdk` package includes a couple of contributed pieces for
 [Django](https://docs.djangoproject.com/):
 
-- Three predeclared and configurable Django views, all accepting a JSON request body:
-  - `auth`
-  - `check`
-  - `cancel`
+- Views for handling the BankID order flows
 - A storage backend utilising Django's cache, called `CacheStorage`
+
+### Sync flow
+
+For synchronous flow there are three predeclared and configurable Django
+views, all accepting a JSON request body:
+
+- `auth`
+- `check`
+- `cancel`
+
+### Async flow
+
+There's an async flow which uses `StreamingHttpResponse` to stream events following
+[server sent events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#event_stream_format)
+interface and requires django to being run with an ASGI server.
+
+When using the async flow there's no need for the client to call the `check`
+endpoint this is done automatically by the async view. An ongoing bankid auth
+order can be continued by supplying the `transation_id` from the original call
+to `async_auth`
+
+- `async_auth`
 
 ### Example setup
 
@@ -100,6 +119,10 @@ urlpatterns = [
     path("auth/", rest.auth, name="auth"),
     path("check/", rest.check, name="check"),
     path("cancel/", rest.cancel, name="cancel"),
+]
+# async auth flow
+urlpatterns = [
+    path("async_auth/", rest.async_auth, name="async_auth"),
 ]
 ```
 
@@ -134,6 +157,8 @@ class BankIDLoginAction(bankid_sdk.AuthAction):
 
         login(request, user)
 ```
+
+_Note: with the async flow the methods should use the `async def` declaration_
 
 The above `authenticate` call from Django requires [writing a custom
 authentication backend](https://docs.djangoproject.com/en/dev/topics/auth/customizing/#writing-an-authentication-backend)
@@ -173,3 +198,41 @@ Checks for a result regarding an authentication or sign order.
 #### `cancel`
 
 Cancels an ongoing sign or auth order.
+
+#### `async_auth`
+
+Works like the `auth` and `check` baked into the same view but returns a
+`StreamingHttpResponse` and streams events to give the status of the order and
+new QR codes.
+
+**Important to note**: the async view is using POST method and therefore the
+browser builtin [EventSource](https://developer.mozilla.org/en-US/docs/Web/API/EventSource)
+will not work as it's only compatible with GET requests.
+
+Since one might potentially want to add custom context data holding
+sensitive/personal information, email etc we don't want to use a GET request as
+query string parameters could be logged in various places.
+
+Here are two JavaScript implementations for POST method SSE:
+
+- [Using fetch API](https://medium.com/@david.richards.tech/sse-server-sent-events-using-a-post-request-without-eventsource-1c0bd6f14425)
+- [Using XMLHttpRequest API](https://solovyov.net/blog/2023/eventsource-post/)
+
+These are the events that can be received from the async view:
+
+- auth - this is the first event sent when a new auth order is initiated.
+Attached data contains the `transaction_id` and and `auto_start_token`
+- pending
+- complete
+- failed
+
+Together with the event there is data that is json encoded.
+These data attributes may be included in that data:
+
+- hint_code (bankid auth failure see
+[BankID API documentation](https://www.bankid.com/en/utvecklare/guider/teknisk-integrationsguide/graenssnittsbeskrivning/collect))
+- detail (error message from raised `FinalizeFailed` in finalize method or
+validation error)
+- order (only set for `complete` event)
+- finalize_data (only set for `complete` event if `finalize` method returns
+data)

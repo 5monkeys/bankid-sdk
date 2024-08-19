@@ -9,6 +9,7 @@ import pytest
 import respx
 
 import bankid_sdk
+from bankid_sdk import OrderRef
 from bankid_sdk.errors import (
     AlreadyInProgress,
     InternalServerError,
@@ -39,10 +40,10 @@ def default_routing(
             async_v60.sign, end_user_ip="127.0.0.1", user_visible_data="visible data"
         )
     elif request.param == "collect":
-        call = partial(async_v60.collect, order_ref="ref")
+        call = partial(async_v60.collect, order_ref=OrderRef("ref"))
     else:
         assert request.param == "cancel"
-        call = partial(async_v60.cancel, order_ref="ref")
+        call = partial(async_v60.cancel, order_ref=OrderRef("ref"))
 
     return bankid_mock[request.param], call
 

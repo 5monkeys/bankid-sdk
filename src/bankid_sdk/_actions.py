@@ -98,3 +98,46 @@ class SignAction(Action):
         Returned transaction context from init is passed as input to finalize
         """
         ...
+
+
+@abstractattrs
+class AsyncAction(ABC):
+    name: ClassVar[Abstract[str]]
+
+    @abstractmethod
+    async def initialize(
+        self, request: Any, context: Any
+    ) -> tuple[UserAuthData | UserSignData, Any]:
+        """
+        Returned transaction context from init is passed as input to finalize
+        """
+        ...
+
+    @abstractmethod
+    async def finalize(
+        self,
+        response: CompleteCollect,
+        request: Any,
+        context: TransactionContext,
+    ) -> dict[str, Any] | None:
+        ...
+
+
+class AsyncAuthAction(AsyncAction):
+    @abstractmethod
+    async def initialize(self, request: Any, context: Any) -> tuple[UserAuthData, Any]:
+        """
+        Returned transaction context from init is passed as input to finalize
+        """
+        ...
+
+
+class AsyncSignAction(AsyncAction):
+    @abstractmethod
+    async def initialize(
+        self, request: Any, context: Any
+    ) -> tuple[UserSignData, TransactionContext]:
+        """
+        Returned transaction context from init is passed as input to finalize
+        """
+        ...

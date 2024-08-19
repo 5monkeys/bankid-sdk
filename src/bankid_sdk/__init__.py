@@ -1,5 +1,7 @@
 from ._actions import (
     Action,
+    AsyncAction,
+    AsyncAuthAction,
     AuthAction,
     FinalizeFailed,
     InitFailed,
@@ -7,7 +9,7 @@ from ._actions import (
     UserAuthData,
     UserSignData,
 )
-from ._auth import init_auth
+from ._auth import ainit_auth, init_auth
 from ._cancel import cancel
 from ._client import AsyncV60, SyncV60
 from ._collect import (
@@ -20,6 +22,7 @@ from ._collect import (
     PendingHintCode,
     TransactionExpired,
     User,
+    acheck,
     check,
 )
 from ._config import config, configure
@@ -38,6 +41,8 @@ __all__ = [
     "__version__",
     "Action",
     "AuthAction",
+    "AsyncAction",
+    "AsyncAuthAction",
     "AsyncV60",
     "BankIDAPIError",
     "BankIDHTTPError",
@@ -66,8 +71,10 @@ __all__ = [
     "UserSignData",
     "cancel",
     "check",
+    "acheck",
     "config",
     "configure",
     "generate_qr_code",
     "init_auth",
+    "ainit_auth",
 ]

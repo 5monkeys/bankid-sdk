@@ -3,14 +3,14 @@ from __future__ import annotations
 from base64 import b64encode
 from typing import TYPE_CHECKING, Any, Literal, NamedTuple
 
-from ._actions import AuthAction
+from ._actions import AsyncAuthAction, AuthAction
 from ._config import config
 from ._order import OrderRequest, Transaction
 from ._requirement import Requirement, _build_requirement_data
-from .typing import Base64, TransactionID
+from .typing import Base64, OrderRef, TransactionID
 
 if TYPE_CHECKING:
-    from ._client import SyncV60
+    from ._client import AsyncV60, SyncV60
 
 
 def encode_user_data(value: str | None, /) -> Base64 | None:
@@ -49,6 +49,7 @@ def build_auth_request(
 class AuthOrder(NamedTuple):
     transaction_id: TransactionID
     auto_start_token: str
+    order_ref: OrderRef
 
 
 def init_auth(
@@ -74,4 +75,32 @@ def init_auth(
             )
         ),
         auto_start_token=order_response.auto_start_token,
+        order_ref=order_response.order_ref,
+    )
+
+
+async def ainit_auth(
+    client: AsyncV60, action: type[AsyncAuthAction], order_request: OrderRequest
+) -> AuthOrder:
+    user_data, transaction_context = await action().initialize(
+        order_request.request, order_request.context
+    )
+    order_response = await client.auth(
+        end_user_ip=order_request.end_user_ip,
+        requirement=order_request.requirement,
+        user_visible_data=user_data.visible,
+        user_non_visible_data=user_data.non_visible,
+        user_visible_data_format=user_data.visible_format,
+    )
+    return AuthOrder(
+        transaction_id=config.STORAGE.save(
+            Transaction(
+                order_response=order_response,
+                operation="auth",
+                action_name=action.name,
+                context=transaction_context,
+            )
+        ),
+        auto_start_token=order_response.auto_start_token,
+        order_ref=order_response.order_ref,
     )

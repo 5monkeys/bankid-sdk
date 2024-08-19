@@ -7,12 +7,13 @@ from typing import TYPE_CHECKING, Any, Union
 import httpx
 from typing_extensions import TypeAlias, assert_never
 
+from ._actions import AsyncAction
 from ._config import config
 from ._order import generate_qr_code
 from .typing import OrderRef, PersonalNumber, TransactionID
 
 if TYPE_CHECKING:
-    from ._client import SyncV60
+    from ._client import AsyncV60, SyncV60
 
 
 @unique
@@ -176,3 +177,31 @@ def check(
         qr_code = generate_qr_code(transaction.order_response)
 
     return result, qr_code
+
+
+async def acheck(
+    client: AsyncV60, transaction_id: TransactionID, request: Any
+) -> tuple[CollectResponse, str | None, dict[str, Any] | None]:
+    # TODO: support async storage
+    transaction = config.STORAGE.load(transaction_id)
+    assert transaction is not None
+
+    finalize_data = None
+
+    result = await client.collect(transaction.order_response.order_ref)
+    if isinstance(result, (CompleteCollect, FailedCollect)):
+        config.STORAGE.delete(transaction_id)
+
+    if isinstance(result, CompleteCollect):
+        action = config.ACTIONS[(transaction.operation, transaction.action_name)]
+        assert issubclass(action, AsyncAction)
+        finalize_data = await action().finalize(result, request, transaction.context)
+
+    qr_code = None
+    if isinstance(result, PendingCollect) and result.hint_code in {
+        PendingHintCode.OUTSTANDING_TRANSACTION,
+        PendingHintCode.NO_CLIENT,
+    }:
+        qr_code = generate_qr_code(transaction.order_response)
+
+    return result, qr_code, finalize_data
