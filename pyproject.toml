@@ -1,8 +1,8 @@
 [build-system]
-build-backend = "hatchling.build"
+build-backend = "setuptools.build_meta"
 requires = [
-  "hatch-vcs",
-  "hatchling",
+  "setuptools",
+  "setuptools-scm",
 ]
 
 [project]
@@ -15,7 +15,7 @@ keywords = [
   "django",
   "rest",
 ]
-license = "BSD-3-Clause"
+license = {file = "LICENSE"}
 authors = [{ name = "Jonas Lundberg", email = "jonas@5monkeys.se" }]
 requires-python = ">=3.9"
 classifiers = [
@@ -65,9 +65,8 @@ urls.Homepage = "https://github.com/5monkeys/bankid-sdk"
 urls.Source = "https://github.com/5monkeys/bankid-sdk"
 urls.Tracker = "https://github.com/5monkeys/bankid-sdk/issues"
 
-[tool.hatch]
-build.hooks.vcs.version-file = "src/bankid_sdk/_version.py"
-version.source = "vcs"
+[tool.setuptools]
+package-dir = {"" = "src"}
 
 [tool.black]
 target-version = ["py39"]
