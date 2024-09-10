@@ -86,8 +86,11 @@ For synchronous flow there are three predeclared and configurable Django
 views, all accepting a JSON request body:
 
 - `auth`
+  - input: `action` and `context`(optional)
 - `check`
+  - input: `transaction_id`
 - `cancel`
+  - input: `transaction_id`
 
 ### Async flow
 
@@ -101,6 +104,7 @@ order can be continued by supplying the `transation_id` from the original call
 to `async_auth`
 
 - `async_auth`
+  - input: `action` and `context`(optional) or `transaction_id`
 
 ### Example setup
 
@@ -229,6 +233,7 @@ Attached data contains the `transaction_id` and and `auto_start_token`
 Together with the event there is data that is json encoded.
 These data attributes may be included in that data:
 
+- qr_code (only set for `pending` event)
 - hint_code (bankid auth failure see
 [BankID API documentation](https://www.bankid.com/en/utvecklare/guider/teknisk-integrationsguide/graenssnittsbeskrivning/collect))
 - detail (error message from raised `FinalizeFailed` in finalize method or
