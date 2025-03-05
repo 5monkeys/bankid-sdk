@@ -39,7 +39,7 @@ dynamic = [
 ]
 dependencies = [
   "abcattrs",
-  "httpx",
+  "httpx>=0.28.1",
 ]
 optional-dependencies.dev = [
   "bankid-sdk[test]",
