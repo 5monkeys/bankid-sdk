@@ -61,6 +61,31 @@ def test_can_send_collect_request_sync(sync_v60: SyncV60) -> None:
         sync_v60.collect(order_ref)
 
 
+async def test_can_send_collect_request_sync_with_return_url(
+    async_v60: AsyncV60,
+) -> None:
+    bankid_mock["collect"].return_value = httpx.Response(
+        HTTPStatus.OK,
+        json={
+            "orderRef": "ref",
+            "status": "pending",
+            "hintCode": "outstandingTransaction",
+        },
+    )
+    await async_v60.collect(OrderRef("ref"), return_url="https://example.com")
+    assert bankid_mock["collect"].call_count == 1
+    request = bankid_mock["collect"].calls.last.request
+    assert request.url.path == "/rp/v6.0/collect"
+    assert request.headers.multi_items() == Contains(
+        ("accept", "application/json"),
+        ("content-type", "application/json"),
+    )
+    assert json.loads(request.content) == {
+        "orderRef": "ref",
+        "returnUrl": "https://example.com",
+    }
+
+
 def can_collect_completed_context() -> Generator[OrderRef, CollectResponse, None]:
     bankid_mock["collect"].return_value = httpx.Response(
         HTTPStatus.OK,

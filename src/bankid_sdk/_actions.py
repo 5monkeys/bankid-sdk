@@ -77,6 +77,11 @@ class Action(ABC):
     ) -> None:
         ...
 
+    def build_return_url(self, request: Any, transaction_id: str) -> str | None:
+        # build return url from request origin
+        base = request.META.get("HTTP_ORIGIN")
+        return f"{base}#nonce={transaction_id}"
+
 
 class AuthAction(Action):
     @abstractmethod

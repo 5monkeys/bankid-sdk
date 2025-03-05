@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import hmac
 import json
+import uuid
 from base64 import b64encode
 from collections.abc import Generator
 from contextlib import AbstractContextManager, contextmanager
@@ -15,7 +16,6 @@ import httpx
 import pytest
 import respx
 from dirty_equals import IsPartialDict, IsStr, IsUUID
-from django.core.signing import TimestampSigner
 from django.test import override_settings
 from django.test.client import Client
 from django.urls import reverse, reverse_lazy
@@ -43,6 +43,9 @@ class DjangoLoginAction(bankid_sdk.AuthAction):
         self, response: bankid_sdk.CompleteCollect, request: Any, context: Any
     ) -> None:
         return None
+
+    def build_return_url(self, request: Any, transaction_id: str) -> str | None:
+        return f"https://example.com/custom-return-url?nonce={transaction_id}"
 
 
 class ForbiddenAction(bankid_sdk.AuthAction):
@@ -194,7 +197,7 @@ class TestAuth:
         )
         response = client.post(
             reverse("auth"),
-            data={"action": "LOGIN", "context": None},
+            data={"action": "LOGIN"},
             content_type="application/json",
             HTTP_X_FORWARDED_FOR="192.168.1.1",
         )
@@ -358,46 +361,48 @@ class TestAuthFlow:
         return order_ref
 
     def test_can_retrieve_completed(self, client: Client) -> None:
-        order_ref = self.valid_auth()
-        bankid_mock["collect"].side_effect = [
-            httpx.Response(
-                HTTPStatus.OK,
-                json={
-                    "orderRef": order_ref,
-                    "status": "pending",
-                    "hintCode": "outstandingTransaction",
-                },
-            ),
-            httpx.Response(
-                HTTPStatus.OK,
-                json={
-                    "orderRef": order_ref,
-                    "status": "pending",
-                    "hintCode": "started",
-                },
-            ),
-            httpx.Response(
-                HTTPStatus.OK,
-                json={
-                    "orderRef": order_ref,
-                    "status": "complete",
-                    "completionData": {
-                        "user": {
-                            "personalNumber": "190000000000",
-                            "name": "John Smith",
-                            "givenName": "John",
-                            "surname": "Smith",
-                        },
-                        "device": {"ipAddress": "127.0.0.1"},
-                        "bankIdIssueDate": "2023-01-01",
-                        "signature": "base64(<visible-data>...</visible-data>)",
-                        "ocspResponse": "base64",
-                    },
-                },
-            ),
-        ]
         with freeze_time("2023-01-01T12:00:00+01:00") as frozen_time:
+            order_ref = self.valid_auth()
             transaction_id = self.start_auth_login_action(client)
+            bankid_mock["collect"].side_effect = [
+                httpx.Response(
+                    HTTPStatus.OK,
+                    json={
+                        "orderRef": order_ref,
+                        "status": "pending",
+                        "hintCode": "outstandingTransaction",
+                    },
+                ),
+                httpx.Response(
+                    HTTPStatus.OK,
+                    json={
+                        "orderRef": order_ref,
+                        "status": "pending",
+                        "hintCode": "started",
+                    },
+                ),
+                httpx.Response(
+                    HTTPStatus.OK,
+                    json={
+                        "transaction_id": transaction_id,
+                        "orderRef": order_ref,
+                        "status": "complete",
+                        "completionData": {
+                            "user": {
+                                "personalNumber": "190000000000",
+                                "name": "John Smith",
+                                "givenName": "John",
+                                "surname": "Smith",
+                            },
+                            "device": {"ipAddress": "127.0.0.1"},
+                            "bankIdIssueDate": "2023-01-01",
+                            "signature": "base64(<visible-data>...</visible-data>)",
+                            "ocspResponse": "base64",
+                        },
+                    },
+                ),
+            ]
+
             frozen_time.tick(timedelta(seconds=1))
             self.check_transaction_is_pending(
                 client,
@@ -428,10 +433,7 @@ class TestAuthFlow:
             "transaction_id": IsStr(min_length=1),
             "auto_start_token": IsStr(min_length=1),
         }
-        payload = TimestampSigner(
-            salt="bankid_sdk.contrib.django.transaction"
-        ).unsign_object(response_data["transaction_id"])
-        assert payload == IsUUID(4)
+        assert response_data["transaction_id"] == IsUUID(4)
 
         call = bankid_mock["auth"].calls.last
         assert (
@@ -441,9 +443,7 @@ class TestAuthFlow:
         return str(response_data["transaction_id"])
 
     def start_auth_login_action(self, client: Client) -> str:
-        transaction_id = self.start_auth(
-            client, body={"action": "LOGIN", "context": None}
-        )
+        transaction_id = self.start_auth(client, body={"action": "LOGIN"})
         call = bankid_mock["auth"].calls.last
         assert json.loads(call.request.content) == IsPartialDict(
             endUserIp="192.168.1.1",
@@ -491,7 +491,9 @@ class TestAuthFlow:
 
         collect_request = bankid_mock["collect"].calls.last.request
         assert json.loads(collect_request.content) == {
-            "orderRef": auth_response_data["orderRef"]
+            "orderRef": auth_response_data["orderRef"],
+            "returnUrl": "https://example.com/custom-return-url?nonce="
+            + transaction_id,
         }
 
     def check_transaction_is_complete(
@@ -601,6 +603,7 @@ class TestAuthFlow:
         bankid_mock["collect"].return_value = httpx.Response(
             HTTPStatus.OK,
             json={
+                "transaction_id": str(uuid.uuid4()),
                 "orderRef": order_ref,
                 "status": "complete",
                 "completionData": {
