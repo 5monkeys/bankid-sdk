@@ -10,7 +10,7 @@ import httpx
 from typing_extensions import Self
 
 from ._requirement import Requirement
-from .typing import OrderRef
+from .typing import OrderRef, TransactionID
 
 
 class OrderRequest(NamedTuple):
@@ -42,6 +42,7 @@ def process_order_response(response: httpx.Response) -> OrderResponse:
 
 
 class SerializedTransaction(TypedDict):
+    transaction_id: str
     order_ref: OrderRef
     auto_start_token: str
     qr_start_token: str
@@ -54,6 +55,7 @@ class SerializedTransaction(TypedDict):
 
 @dataclass(frozen=True)
 class Transaction:
+    transaction_id: TransactionID
     order_response: OrderResponse
     operation: Literal["auth", "sign"]
     action_name: str
@@ -62,6 +64,7 @@ class Transaction:
     @classmethod
     def from_dict(cls, obj: dict[str, Any], /) -> Self:
         return cls(
+            transaction_id=obj["transaction_id"],
             order_response=OrderResponse(
                 order_ref=OrderRef(str(obj["order_ref"])),
                 auto_start_token=str(obj["auto_start_token"]),
@@ -76,6 +79,7 @@ class Transaction:
 
     def as_dict(self) -> SerializedTransaction:
         return SerializedTransaction(
+            transaction_id=self.transaction_id,
             order_ref=self.order_response.order_ref,
             auto_start_token=self.order_response.auto_start_token,
             qr_start_token=self.order_response.qr_start_token,

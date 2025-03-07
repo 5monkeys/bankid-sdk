@@ -77,6 +77,9 @@ class Action(ABC):
     ) -> None:
         ...
 
+    def build_return_url(self, request: Any, transaction_id: str) -> str | None:
+        return None
+
 
 class AuthAction(Action):
     @abstractmethod

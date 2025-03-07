@@ -2,14 +2,13 @@ from __future__ import annotations
 
 from contextlib import suppress
 from typing import Final, Protocol
-from uuid import uuid4
 
 from ._order import Transaction
 from .typing import TransactionID
 
 
 class Storage(Protocol):
-    def save(self, obj: Transaction, /) -> TransactionID:
+    def save(self, obj: Transaction, /) -> None:
         ...
 
     def load(self, key: TransactionID, /) -> Transaction | None:
@@ -26,10 +25,8 @@ class MemoryStorage:
     def __init__(self) -> None:
         self.content = dict[TransactionID, Transaction]()
 
-    def save(self, obj: Transaction, /) -> TransactionID:
-        transaction_id = TransactionID(str(uuid4()))
-        self.content[transaction_id] = obj
-        return transaction_id
+    def save(self, obj: Transaction, /) -> None:
+        self.content[obj.transaction_id] = obj
 
     def load(self, key: TransactionID, /) -> Transaction | None:
         obj = self.content.get(key, self.NO_VALUE)

@@ -58,20 +58,20 @@ _Client = TypeVar("_Client", bound=GetExcHooks)
 
 @overload
 def handle_exception(
-    method: Callable[Concatenate[_Client, P], Awaitable[T]]
+    method: Callable[Concatenate[_Client, P], Awaitable[T]],
 ) -> Callable[Concatenate[_Client, P], Awaitable[T]]:
     ...
 
 
 @overload
 def handle_exception(
-    method: Callable[Concatenate[_Client, P], T]
+    method: Callable[Concatenate[_Client, P], T],
 ) -> Callable[Concatenate[_Client, P], T]:
     ...
 
 
 def handle_exception(
-    method: Callable[Concatenate[_Client, P], T]
+    method: Callable[Concatenate[_Client, P], T],
 ) -> Callable[Concatenate[_Client, P], Awaitable[T] | T]:
     """
     Activates a client's currently configured exception hook/handling chain.
@@ -139,6 +139,7 @@ class AsyncV60(V60Base):
         user_visible_data: str | None = None,
         user_non_visible_data: str | None = None,
         user_visible_data_format: Literal["simpleMarkdownV1"] | None = None,
+        return_url: str | None = None,
     ) -> OrderResponse:
         data = build_auth_request(
             end_user_ip,
@@ -146,6 +147,7 @@ class AsyncV60(V60Base):
             user_visible_data,
             user_non_visible_data,
             user_visible_data_format,
+            return_url=return_url,
         )
         response = await self.client.post(
             self.build_path("/auth"), json=data, headers=self.headers
@@ -175,11 +177,14 @@ class AsyncV60(V60Base):
 
     @handle_exception
     async def collect(
-        self, order_ref: OrderRef
+        self, order_ref: OrderRef, return_url: str | None = None
     ) -> PendingCollect | CompleteCollect | FailedCollect:
+        data: dict[str, Any] = {"orderRef": order_ref}
+        if return_url is not None:
+            data["returnUrl"] = return_url
         response = await self.client.post(
             self.build_path("/collect"),
-            json={"orderRef": order_ref},
+            json=data,
             headers=self.headers,
         )
         return process_collect_response(response)
@@ -209,6 +214,7 @@ class SyncV60(V60Base):
         user_visible_data: str | None = None,
         user_non_visible_data: str | None = None,
         user_visible_data_format: Literal["simpleMarkdownV1"] | None = None,
+        return_url: str | None = None,
     ) -> OrderResponse:
         data = build_auth_request(
             end_user_ip,
@@ -216,6 +222,7 @@ class SyncV60(V60Base):
             user_visible_data,
             user_non_visible_data,
             user_visible_data_format,
+            return_url=return_url,
         )
         response = self.client.post(
             self.build_path("/auth"), json=data, headers=self.headers
@@ -245,11 +252,14 @@ class SyncV60(V60Base):
 
     @handle_exception
     def collect(
-        self, order_ref: OrderRef
+        self, order_ref: OrderRef, return_url: str | None = None
     ) -> PendingCollect | CompleteCollect | FailedCollect:
+        data: dict[str, Any] = {"orderRef": order_ref}
+        if return_url is not None:
+            data["returnUrl"] = return_url
         response = self.client.post(
             self.build_path("/collect"),
-            json={"orderRef": order_ref},
+            json=data,
             headers=self.headers,
         )
         return process_collect_response(response)

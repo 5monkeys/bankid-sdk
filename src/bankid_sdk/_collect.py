@@ -146,6 +146,10 @@ class TransactionExpired(Exception):
     ...
 
 
+class ActionNotFoundError(Exception):
+    ...
+
+
 def check(
     client: SyncV60, transaction_id: TransactionID, request: Any
 ) -> tuple[CollectResponse, str | None]:
@@ -154,7 +158,11 @@ def check(
         # TODO: Log
         raise TransactionExpired
 
-    result = client.collect(transaction.order_response.order_ref)
+    action = config.ACTIONS.get((transaction.operation, transaction.action_name))
+    if action is None:
+        raise ActionNotFoundError
+    return_url = action().build_return_url(request, transaction_id=transaction_id)
+    result = client.collect(transaction.order_response.order_ref, return_url=return_url)
     if isinstance(result, (CompleteCollect, FailedCollect)):
         # Clear transaction from storage as soon as we encounter a finished BankID
         # collection. As we can't interact with its order any longer
@@ -162,11 +170,9 @@ def check(
 
     if isinstance(result, CompleteCollect):
         action = config.ACTIONS.get((transaction.operation, transaction.action_name))
-        if action is not None:
-            action().finalize(result, request, transaction.context)
-        else:
-            # TODO: Log error
-            ...
+        if action is None:  # pragma: no cover
+            raise ActionNotFoundError
+        action().finalize(result, request, transaction.context)
 
     qr_code = None
     if isinstance(result, PendingCollect) and result.hint_code in {

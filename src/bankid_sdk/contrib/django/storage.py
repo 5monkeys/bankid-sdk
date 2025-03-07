@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from uuid import uuid4
-
 from django.core.cache import cache
 
 import bankid_sdk
@@ -10,11 +8,9 @@ import bankid_sdk
 class CacheStorage:
     __slots__ = ()
 
-    def save(self, obj: bankid_sdk.Transaction, /) -> bankid_sdk.TransactionID:
-        transaction_id = bankid_sdk.TransactionID(str(uuid4()))
+    def save(self, obj: bankid_sdk.Transaction, /) -> None:
         # Kept in cache for 15min
-        cache.set(key=transaction_id, value=obj.as_dict(), timeout=60 * 15)
-        return transaction_id
+        cache.set(key=obj.transaction_id, value=obj.as_dict(), timeout=60 * 15)
 
     def load(self, key: bankid_sdk.TransactionID, /) -> bankid_sdk.Transaction | None:
         obj = cache.get(key)

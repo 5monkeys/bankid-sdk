@@ -16,7 +16,7 @@ import bankid_sdk
 from bankid_sdk.utils import logger
 
 from .request import get_client_ip, parse_json_body, require_POST
-from .transaction import envelop, mask_last_four, verify_envelope
+from .transaction import mask_last_four
 
 View: TypeAlias = Callable[[HttpRequest], HttpResponse]
 APIView: TypeAlias = Callable[[HttpRequest, dict[str, Any]], HttpResponse]
@@ -88,7 +88,7 @@ def auth(request: HttpRequest, data: dict[str, Any]) -> JsonResponse:
                     end_user_ip=str(client_ip),
                     requirement=None,
                     request=request,
-                    context=data.get("context"),
+                    context=data.get("context", {}),
                 ),
             )
         except bankid_sdk.InitFailed as exc:
@@ -101,7 +101,7 @@ def auth(request: HttpRequest, data: dict[str, Any]) -> JsonResponse:
 
     return JsonResponse(
         {
-            "transaction_id": envelop(order.transaction_id),
+            "transaction_id": order.transaction_id,
             "auto_start_token": order.auto_start_token,
         }
     )
@@ -112,7 +112,7 @@ def validate_transaction_id(
 ) -> Callable[[HttpRequest, dict[str, Any]], HttpResponse]:
     @wraps(view)
     def inner(request: HttpRequest, data: dict[str, Any], /) -> HttpResponse:
-        transaction_id = verify_envelope(str(data.get("transaction_id") or ""))
+        transaction_id = data.get("transaction_id")
         if transaction_id is None:
             detail = (
                 {

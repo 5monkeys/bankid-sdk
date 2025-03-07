@@ -133,6 +133,11 @@ class BankIDLoginAction(bankid_sdk.AuthAction):
             raise bankid_sdk.FinalizeFailed(detail="No registered user found")
 
         login(request, user)
+
+    # Optional method to define to build a custom return url
+    # defaults to current host origin with url fragment #nonce={transaction_id}
+    def build_return_url(self, request: Any, transaction_id: str) -> str | None:
+        return f"https://some-custom-return-url.com/#nonce={transaction_id}"
 ```
 
 The above `authenticate` call from Django requires [writing a custom
