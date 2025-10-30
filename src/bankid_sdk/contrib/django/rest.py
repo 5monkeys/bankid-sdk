@@ -77,8 +77,7 @@ def auth(request: HttpRequest, data: dict[str, Any]) -> JsonResponse:
 
     with httpx.Client(
         base_url=bankid_sdk.config.API_BASE_URL,
-        cert=bankid_sdk.config.CERT,
-        verify=bankid_sdk.config.CA_CERT,
+        verify=bankid_sdk.config.SSL_CONTEXT,
     ) as client:
         try:
             order = bankid_sdk.init_auth(
@@ -157,8 +156,7 @@ def check(
 ) -> JsonResponse:
     with httpx.Client(
         base_url=bankid_sdk.config.API_BASE_URL,
-        cert=bankid_sdk.config.CERT,
-        verify=bankid_sdk.config.CA_CERT,
+        verify=bankid_sdk.config.SSL_CONTEXT,
     ) as client:
         try:
             result, qr_code = bankid_sdk.check(
@@ -212,8 +210,7 @@ def cancel(
 ) -> HttpResponse:
     with httpx.Client(
         base_url=bankid_sdk.config.API_BASE_URL,
-        cert=bankid_sdk.config.CERT,
-        verify=bankid_sdk.config.CA_CERT,
+        verify=bankid_sdk.config.SSL_CONTEXT,
     ) as client:
         bankid_sdk.cancel(bankid_sdk.SyncV60(client=client), transaction_id)
 

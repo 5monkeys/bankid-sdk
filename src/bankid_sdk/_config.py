@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ssl
 from collections.abc import Iterable, Mapping
 from contextlib import suppress
 from types import MappingProxyType
@@ -88,7 +89,7 @@ class _Configuration:
     # two-tuple of certificate file path and key file path
     CERT = LazyAttr[tuple[str, str]]()
     # BankID's CA root certificate file
-    CA_CERT = LazyAttr[str]()
+    SSL_CONTEXT = LazyAttr[ssl.SSLContext]()
 
 
 config: Final = _Configuration()
@@ -115,7 +116,9 @@ def configure(
                 for action in actions
             }
         )
-    if certificate is not None:
-        config.CERT = certificate
-    if ca_cert is not None:
-        config.CA_CERT = ca_cert
+
+    if certificate is not None and ca_cert is not None:
+        config.SSL_CONTEXT = ssl.create_default_context(
+            cafile=ca_cert,
+        )
+        config.SSL_CONTEXT.load_cert_chain(*certificate)
