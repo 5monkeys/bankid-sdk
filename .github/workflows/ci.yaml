@@ -23,16 +23,22 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - { py: "3.13", django: "52" }
+          - { py: "3.13", django: "51" }
+          - { py: "3.12", django: "52" }
+          - { py: "3.12", django: "51" }
           - { py: "3.12", django: "50" }
           - { py: "3.12", django: "42" }
+          - { py: "3.11", django: "52" }
+          - { py: "3.11", django: "51" }
           - { py: "3.11", django: "50" }
           - { py: "3.11", django: "42" }
           - { py: "3.11", django: "41" }
+          - { py: "3.10", django: "52" }
+          - { py: "3.10", django: "51" }
           - { py: "3.10", django: "50" }
           - { py: "3.10", django: "42" }
           - { py: "3.10", django: "41" }
-          - { py: "3.9", django: "42" }
-          - { py: "3.9", django: "41" }
     steps:
       - uses: actions/checkout@v5
       - name: Setup python for tox
@@ -65,7 +71,7 @@ jobs:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
         with:
-          python-version: '3.9'
+          python-version: '3.10'
       - run: python -m pip install tox
       - name: Run mypy
         run: tox -e mypy

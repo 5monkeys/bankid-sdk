@@ -17,7 +17,7 @@ keywords = [
 ]
 license = "BSD-3-Clause"
 authors = [{ name = "Jonas Lundberg", email = "jonas@5monkeys.se" }]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 classifiers = [
   "Development Status :: 4 - Beta",
   "Framework :: Django",
@@ -28,10 +28,10 @@ classifiers = [
   "License :: OSI Approved :: BSD License",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "Typing :: Typed",
 ]
 dynamic = [
@@ -70,12 +70,12 @@ build.hooks.vcs.version-file = "src/bankid_sdk/_version.py"
 version.source = "vcs"
 
 [tool.black]
-target-version = ["py39"]
+target-version = ["py310"]
 
 [tool.ruff]
 src = ["src", "tests"]
 fix = true
-target-version = "py39"
+target-version = "py310"
 line-length = 88
 select = [
   "B",
@@ -158,7 +158,7 @@ branch = true
 source = ["bankid_sdk", "tests"]
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.10"
 pretty = true
 show_error_codes = true
 files = "src, tests"

@@ -10,22 +10,22 @@
       in
       {
         packages = flakeUtils.lib.flattenTree {
-          python39 = pkgs.python39;
           python310 = pkgs.python310;
           python311 = pkgs.python311;
           python312 = pkgs.python312;
+          python313 = pkgs.python313;
         };
         devShell = pkgs.mkShell {
           buildInputs = with self.packages.${system}; [
-            python39
             python310
             python311
             python312
+            python313
           ];
           shellHook = ''
             [[ ! -d .venv ]] && \
               echo "Creating virtualenv ..." && \
-              ${pkgs.python39}/bin/python -m \
+              ${pkgs.python310}/bin/python -m \
                 venv --copies --upgrade-deps .venv > /dev/null
             source .venv/bin/activate
             pip install --require-virtualenv --no-input tox
