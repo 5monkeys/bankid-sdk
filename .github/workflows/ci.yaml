@@ -23,6 +23,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - { py: "3.14", django: "52" }
           - { py: "3.13", django: "52" }
           - { py: "3.13", django: "51" }
           - { py: "3.12", django: "52" }

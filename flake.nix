@@ -14,6 +14,7 @@
           python311 = pkgs.python311;
           python312 = pkgs.python312;
           python313 = pkgs.python313;
+          python314 = pkgs.python314;
         };
         devShell = pkgs.mkShell {
           buildInputs = with self.packages.${system}; [
@@ -21,6 +22,7 @@
             python311
             python312
             python313
+            python314
           ];
           shellHook = ''
             [[ ! -d .venv ]] && \
