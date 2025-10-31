@@ -57,8 +57,7 @@ class ForbiddenAction(bankid_sdk.AuthAction):
 
     def finalize(
         self, response: bankid_sdk.CompleteCollect, request: Any, context: Any
-    ) -> None:
-        ...
+    ) -> None: ...
 
 
 class FailsInitAction(bankid_sdk.AuthAction):
@@ -71,8 +70,7 @@ class FailsInitAction(bankid_sdk.AuthAction):
 
     def finalize(
         self, response: bankid_sdk.CompleteCollect, request: Any, context: Any
-    ) -> None:
-        ...
+    ) -> None: ...
 
 
 class FailsFinalizeAction(bankid_sdk.AuthAction):
@@ -94,7 +92,7 @@ class FailsFinalizeAction(bankid_sdk.AuthAction):
         raise bankid_sdk.FinalizeFailed
 
 
-@pytest.fixture()
+@pytest.fixture
 def _configure_bankid_sdk(fixtures_dir: Path) -> None:
     bankid_sdk.configure(
         api_base_url="https://example.com",
