@@ -89,16 +89,13 @@ class Transaction:
 
 class _Order(Protocol):
     @property
-    def qr_start_token(self) -> str:
-        ...
+    def qr_start_token(self) -> str: ...
 
     @property
-    def qr_start_secret(self) -> str:
-        ...
+    def qr_start_secret(self) -> str: ...
 
     @property
-    def start_time(self) -> datetime:
-        ...
+    def start_time(self) -> datetime: ...
 
 
 def generate_qr_code(order: _Order) -> str:

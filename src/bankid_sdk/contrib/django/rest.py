@@ -3,14 +3,13 @@ from __future__ import annotations
 from collections.abc import Callable
 from functools import wraps
 from http import HTTPStatus
-from typing import Any
+from typing import Any, TypeAlias
 
 import httpx
 from django.conf import settings as django_settings
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
-from typing_extensions import TypeAlias
 
 import bankid_sdk
 from bankid_sdk.utils import logger
@@ -107,7 +106,7 @@ def auth(request: HttpRequest, data: dict[str, Any]) -> JsonResponse:
 
 
 def validate_transaction_id(
-    view: Callable[[HttpRequest, bankid_sdk.TransactionID], HttpResponse]
+    view: Callable[[HttpRequest, bankid_sdk.TransactionID], HttpResponse],
 ) -> Callable[[HttpRequest, dict[str, Any]], HttpResponse]:
     @wraps(view)
     def inner(request: HttpRequest, data: dict[str, Any], /) -> HttpResponse:

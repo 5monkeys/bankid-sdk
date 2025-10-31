@@ -27,7 +27,7 @@ from tests.mocks import bankid_mock
 pytestmark = pytest.mark.usefixtures("mock_bankid")
 
 
-@pytest.fixture()
+@pytest.fixture
 def default_routing(
     request: pytest.FixtureRequest,
     async_v60: bankid_sdk.AsyncV60,
@@ -146,8 +146,7 @@ async def test_raises(
 async def test_can_add_additional_exception_handling(
     async_v60: bankid_sdk.AsyncV60,
 ) -> None:
-    class CustomException(Exception):
-        ...
+    class CustomException(Exception): ...
 
     @contextmanager
     def handle_something_additional() -> Generator[None, None, None]:

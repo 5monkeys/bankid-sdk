@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum, unique
-from typing import TYPE_CHECKING, Any, Union
+from typing import TYPE_CHECKING, Any, TypeAlias
 
 import httpx
-from typing_extensions import TypeAlias, assert_never
+from typing_extensions import assert_never
 
 from ._config import config
 from ._order import generate_qr_code
@@ -91,7 +91,7 @@ class FailedCollect:
     hint_code: FailedHintCode
 
 
-CollectResponse: TypeAlias = Union[PendingCollect, CompleteCollect, FailedCollect]
+CollectResponse: TypeAlias = PendingCollect | CompleteCollect | FailedCollect
 
 
 def process_collect_response(response: httpx.Response) -> CollectResponse:
@@ -142,8 +142,7 @@ def process_collect_response(response: httpx.Response) -> CollectResponse:
     assert_never(status)
 
 
-class TransactionExpired(Exception):
-    ...
+class TransactionExpired(Exception): ...
 
 
 def check(
@@ -155,7 +154,7 @@ def check(
         raise TransactionExpired
 
     result = client.collect(transaction.order_response.order_ref)
-    if isinstance(result, (CompleteCollect, FailedCollect)):
+    if isinstance(result, CompleteCollect | FailedCollect):
         # Clear transaction from storage as soon as we encounter a finished BankID
         # collection. As we can't interact with its order any longer
         config.STORAGE.delete(transaction_id)

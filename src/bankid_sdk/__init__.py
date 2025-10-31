@@ -35,10 +35,9 @@ except ImportError:  # pragma: no cover
     __version__ = "unknown"
 
 __all__ = [
-    "__version__",
     "Action",
-    "AuthAction",
     "AsyncV60",
+    "AuthAction",
     "BankIDAPIError",
     "BankIDHTTPError",
     "CompleteCollect",
@@ -64,6 +63,7 @@ __all__ = [
     "User",
     "UserAuthData",
     "UserSignData",
+    "__version__",
     "cancel",
     "check",
     "config",
