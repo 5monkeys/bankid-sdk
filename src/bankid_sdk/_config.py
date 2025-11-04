@@ -10,11 +10,12 @@ from typing import (
     Final,
     Generic,
     Literal,
+    TypeAlias,
     TypeVar,
     overload,
 )
 
-from typing_extensions import Self, TypeAlias
+from typing_extensions import Self
 
 from ._actions import Action, AuthAction, SignAction
 
@@ -22,8 +23,7 @@ if TYPE_CHECKING:
     from ._storage import Storage
 
 
-class ConfigurationError(Exception):
-    ...
+class ConfigurationError(Exception): ...
 
 
 T = TypeVar("T")
@@ -38,7 +38,7 @@ class LazyAttr(Generic[T]):
     Allows a container instance to exist but hold no attribute value until later on.
     """
 
-    __slots__ = ("value", "attrname")
+    __slots__ = ("attrname", "value")
     value: T
     attrname: str | None
 
@@ -55,12 +55,10 @@ class LazyAttr(Generic[T]):
             )
 
     @overload
-    def __get__(self, instance: None, owner: Any = ...) -> Self:
-        ...
+    def __get__(self, instance: None, owner: Any = ...) -> Self: ...
 
     @overload
-    def __get__(self, instance: _Configuration, owner: Any = ...) -> T:
-        ...
+    def __get__(self, instance: _Configuration, owner: Any = ...) -> T: ...
 
     def __get__(self, instance: _Configuration | None, owner: Any = None) -> Self | T:
         if instance is None:

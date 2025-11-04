@@ -8,10 +8,10 @@ from contextlib import suppress
 from functools import wraps
 from http import HTTPStatus
 from ipaddress import IPv4Address, IPv6Address, ip_address
-from typing import Any, NoReturn
+from typing import Any, Concatenate, NoReturn
 
 from django.http import HttpRequest, HttpResponse, JsonResponse
-from typing_extensions import Concatenate, ParamSpec
+from typing_extensions import ParamSpec
 
 
 def load_stream(request: HttpRequest) -> codecs._ReadableStream:
@@ -88,7 +88,7 @@ P = ParamSpec("P")
 
 
 def require_POST(
-    view: Callable[Concatenate[HttpRequest, P], HttpResponse]
+    view: Callable[Concatenate[HttpRequest, P], HttpResponse],
 ) -> Callable[Concatenate[HttpRequest, P], HttpResponse]:
     """
     Reimplementation of django.views.decorators.http.require_POST that returns a JSON

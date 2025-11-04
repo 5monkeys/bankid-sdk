@@ -6,7 +6,7 @@ import bankid_sdk
 from bankid_sdk._config import ConfigurationError, LazyAttr
 
 
-@pytest.fixture()
+@pytest.fixture
 def _reset_config() -> None:
     for value in bankid_sdk.config.__class__.__dict__.values():
         if isinstance(value, LazyAttr):

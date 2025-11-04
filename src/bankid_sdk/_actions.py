@@ -74,8 +74,7 @@ class Action(ABC):
         response: CompleteCollect,
         request: Any,
         context: TransactionContext,
-    ) -> None:
-        ...
+    ) -> None: ...
 
 
 class AuthAction(Action):

@@ -14,11 +14,11 @@ from .mocks import bankid_mock
 
 def configure_django() -> None:
     try:
-        import django
+        import django  # noqa: PLC0415
     except ImportError:  # pragma: no cover
         return
 
-    from django.conf import settings
+    from django.conf import settings  # noqa: PLC0415
 
     settings.configure(
         DATABASES={
@@ -38,28 +38,28 @@ def pytest_configure(config: pytest.Config) -> None:
     configure_django()
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_bankid() -> Generator[respx.Router, None, None]:
     with bankid_mock as mocked:
         yield mocked
 
 
-@pytest.fixture()
+@pytest.fixture
 def mocked_async_client(mock_bankid: respx.Router) -> httpx.AsyncClient:
     return httpx.AsyncClient(base_url="https://example.com/")
 
 
-@pytest.fixture()
+@pytest.fixture
 def mocked_sync_client(mock_bankid: respx.Router) -> httpx.Client:
     return httpx.Client(base_url="https://example.com/")
 
 
-@pytest.fixture()
+@pytest.fixture
 def fixtures_dir() -> Path:
     return Path(__file__).parent / "fixtures"
 
 
-@pytest.fixture()
+@pytest.fixture
 def valid_collect() -> bankid_sdk.OrderRef:
     order_ref = bankid_sdk.OrderRef(str(uuid4()))
     bankid_mock["collect"].side_effect = [

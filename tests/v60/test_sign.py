@@ -20,7 +20,7 @@ from tests.mocks import bankid_mock
 pytestmark = pytest.mark.usefixtures("mock_bankid")
 
 
-@pytest.fixture()
+@pytest.fixture
 def _valid_sign() -> None:
     bankid_mock["sign"].return_value = httpx.Response(
         HTTPStatus.OK,

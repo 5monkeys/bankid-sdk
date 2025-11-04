@@ -15,23 +15,26 @@ keywords = [
   "django",
   "rest",
 ]
-license = "BSD-3-Clause"
-authors = [{ name = "Jonas Lundberg", email = "jonas@5monkeys.se" }]
-requires-python = ">=3.9"
+license = { file = "LICENSE" }
+authors = [ { name = "Jonas Lundberg", email = "jonas@5monkeys.se" } ]
+requires-python = ">=3.10"
 classifiers = [
   "Development Status :: 4 - Beta",
   "Framework :: Django",
   "Framework :: Django :: 4.1",
   "Framework :: Django :: 4.2",
   "Framework :: Django :: 5.0",
+  "Framework :: Django :: 5.1",
+  "Framework :: Django :: 5.2",
   "Intended Audience :: Developers",
   "License :: OSI Approved :: BSD License",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Typing :: Typed",
 ]
 dynamic = [
@@ -70,14 +73,15 @@ build.hooks.vcs.version-file = "src/bankid_sdk/_version.py"
 version.source = "vcs"
 
 [tool.black]
-target-version = ["py39"]
+target-version = [ "py310" ]
 
 [tool.ruff]
-src = ["src", "tests"]
-fix = true
-target-version = "py39"
+target-version = "py310"
 line-length = 88
-select = [
+src = [ "src", "tests" ]
+fix = true
+
+lint.select = [
   "B",
   "BLE",
   "C4",
@@ -112,9 +116,9 @@ select = [
   "TRY",
   "UP",
   "W",
-  "YTT"
+  "YTT",
 ]
-ignore = [
+lint.ignore = [
   # We've deemed ourselves good designers of our interfaces and would only have
   # motivated ignores.
   "PLR0913",
@@ -122,16 +126,12 @@ ignore = [
   "S101",
   "TRY003",  # Don't care about length of messages for exception classes
 ]
-
-[tool.ruff.per-file-ignores]
-"tests/**" = ["PLR2004", "S105", "S106"]
-
-[tool.ruff.isort]
-known-first-party = ["bankid_sdk", "tests"]
-combine-as-imports = true
+lint.per-file-ignores."tests/**" = [ "PLR2004", "S105", "S106" ]
+lint.isort.combine-as-imports = true
+lint.isort.known-first-party = [ "bankid_sdk", "tests" ]
 
 [tool.pytest.ini_options]
-testpaths = ["tests", "src"]
+testpaths = [ "tests", "src" ]
 addopts = "--cov --no-cov-on-fail"
 asyncio_mode = "auto"
 
@@ -155,10 +155,10 @@ fail_under = 100
 [tool.coverage.run]
 parallel = true
 branch = true
-source = ["bankid_sdk", "tests"]
+source = [ "bankid_sdk", "tests" ]
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.10"
 pretty = true
 show_error_codes = true
 files = "src, tests"

@@ -7,6 +7,7 @@ from contextlib import AbstractContextManager, ExitStack, contextmanager
 from functools import wraps
 from typing import (
     Any,
+    Concatenate,
     Final,
     Literal,
     Protocol,
@@ -16,7 +17,7 @@ from typing import (
 from urllib.parse import urljoin
 
 import httpx
-from typing_extensions import Concatenate, ParamSpec, Self
+from typing_extensions import ParamSpec, Self
 
 from ._auth import build_auth_request
 from ._collect import (
@@ -33,8 +34,7 @@ from .typing import OrderRef
 
 
 class GetExcHooks(Protocol):
-    def get_exc_hooks(self) -> Iterable[AbstractContextManager[Any]]:
-        ...
+    def get_exc_hooks(self) -> Iterable[AbstractContextManager[Any]]: ...
 
 
 @contextmanager
@@ -58,20 +58,18 @@ _Client = TypeVar("_Client", bound=GetExcHooks)
 
 @overload
 def handle_exception(
-    method: Callable[Concatenate[_Client, P], Awaitable[T]]
-) -> Callable[Concatenate[_Client, P], Awaitable[T]]:
-    ...
+    method: Callable[Concatenate[_Client, P], Awaitable[T]],
+) -> Callable[Concatenate[_Client, P], Awaitable[T]]: ...
 
 
 @overload
 def handle_exception(
-    method: Callable[Concatenate[_Client, P], T]
-) -> Callable[Concatenate[_Client, P], T]:
-    ...
+    method: Callable[Concatenate[_Client, P], T],
+) -> Callable[Concatenate[_Client, P], T]: ...
 
 
 def handle_exception(
-    method: Callable[Concatenate[_Client, P], T]
+    method: Callable[Concatenate[_Client, P], T],
 ) -> Callable[Concatenate[_Client, P], Awaitable[T] | T]:
     """
     Activates a client's currently configured exception hook/handling chain.
@@ -94,7 +92,7 @@ def handle_exception(
 
 
 class V60Base:
-    __slots__ = ("headers", "_exc_hooks")
+    __slots__ = ("_exc_hooks", "headers")
     path_prefix: Final[str] = "/rp/v6.0/"
 
     def __init__(self) -> None:
